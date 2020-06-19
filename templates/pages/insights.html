@@ -1,0 +1,168 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<h1>NBA Player Stats</h1>
+<br />
+<div class="row animate-bottom" id="mainContainer" style="dislay: none;">
+    <div class="row text-center">
+        <div class="col-md-4">
+            <h5>NBA All Time Free Throw Average</h5>
+            <h1>{{ averageFTpct }}</h1>
+        </div>
+        <div class="col-md-4">
+            <h5>NBA All Time 2pt Average</h5>
+            <h1>{{ average2pct }}</h1>
+        </div>
+        <div class="col-md-4">
+            <h5>NBA All Time 3pt Average</h5>
+            <h1>{{ average3pct }}</h1>
+        </div>
+    </div>
+    <br />
+    <hr />
+    <br />
+    <div class="row text-center">
+        <div class="col-md-6">
+            <h5>Lakers Players in Dataset</h5>
+            <h1>{{ lakers_players }}</h1>
+        </div>
+        <div class="col-md-6">
+            <h5>Jazz Players in Dataset</h5>
+            <h1>{{ jazz_players }}</h1>
+        </div>
+    </div>
+    <br />
+    <hr />
+    <br />
+    <div class="row">
+        <div class="col-md-9">
+            <canvas id="line" width="400" height="200"></canvas>
+        </div>
+        <div class="col-md-3">
+            <canvas id="donut" width="400" height="400"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    function myFunction() {
+        myVar = setTimeout(showPage, 3000);
+    }
+
+    function showPage() {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("mainContainer").style.display = "block";
+    }
+</script>
+
+<script>
+    let lineGraph = document.getElementById('line').getContext('2d')
+    let donutGraph = document.getElementById('donut').getContext('2d')
+
+    let player_data = {{ json_player_data | safe }}
+    let labels = [1980, 2000, 2016]
+
+    let FTData = []
+    let twoPtData = []
+    let threePtData = []
+
+    let twoPpct = 0
+    let threePpct = 0
+    let FTPpct = 0
+
+    let count = 0
+
+    for (i = 0; i < labels.length; i++) {
+        let currentYear = labels[i]
+        console.log(currentYear)
+
+        for (var key of Object.keys(player_data)) {
+            if (player_data[key]['Year'] == currentYear) {
+                count += 1
+
+                if (player_data[key]['FTpct'] != '') {
+                    if (player_data[key]['FTpct'].includes(".")) {
+                        FTPpct += parseFloat(player_data[key]['FTpct']) * 100.00
+                    } else {
+                        FTPpct += parseInt(player_data[key]['FTpct'], 10) * 100
+                    }
+                } else {
+                    FTPpct += 0
+                }
+
+                if (player_data[key]['2Ppct'] != '') {
+                    if (player_data[key]['2Ppct'].includes(".")) {
+                        twoPpct += parseFloat(player_data[key]['2Ppct']) * 100.00
+                    } else {
+                        twoPpct += parseInt(player_data[key]['2Ppct'], 10) * 100
+                    }
+                } else {
+                    twoPpct += 0
+                }
+
+                if (player_data[key]['3Ppct'] != '') {
+                    if (player_data[key]['3Ppct'].includes(".")) {
+                        threePpct += parseFloat(player_data[key]['3Ppct']) * 100.00
+                    } else {
+                        threePpct += parseInt(player_data[key]['3Ppct'], 10) * 100
+                    }
+                } else {
+                    threePpct += 0
+                }
+
+            }
+        }
+
+        FTData.push(FTPpct / count)
+        console.log(FTData)
+
+        twoPtData.push(twoPpct / count)
+        console.log(twoPtData)
+
+        threePtData.push(threePpct / count)
+        console.log(threePtData)
+    }
+
+    let donutChart = new Chart(document.getElementById("donut"), {
+        type: 'doughnut',
+        data: {
+            labels: ["Jazz Players", "Lakers Players"],
+            datasets: [
+                {
+                    label: "Jazz vs Lakers Players",
+                    backgroundColor: ["#FF0000", "#6284FF"],
+                    data: [{{ jazz_players }}, {{ lakers_players }}]
+    }
+            ]
+        }
+    });
+
+    let lineChart = new Chart(lineGraph, {
+        // The type of chart we want to create
+        type: 'line',
+
+        // The data for our dataset
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '2pt Percentage By Year',
+                backgroundColor: 'transparent',
+                borderColor: '#6284FF',
+                data: twoPtData
+            }, {
+                label: '3pt Percentage By Year',
+                backgroundColor: 'transparent',
+                borderColor: '#6284FF',
+                data: threePtData
+            }, {
+                label: 'Free Throw Percentage By Year',
+                backgroundColor: 'transparent',
+                borderColor: '#6284FF',
+                data: FTData
+            }]
+        },
+
+        // Configuration options go here
+        options: {}
+    });
+</script>
+{% endblock %}

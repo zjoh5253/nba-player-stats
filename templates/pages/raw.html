@@ -1,0 +1,46 @@
+{% extends 'layouts/main.html' %}
+{% block content %}
+<h1>NBA Player Stats</h1>
+<br />
+<div class="row animate-bottom" id="mainContainer" style="dislay: none;">
+    <div class="col-md-12">
+        <table class="table" id="list" style="width: 100%">
+            <thead>
+                <tr>
+                    <td>Player</td>
+                    <td>Year</td>
+                    <td>Team</td>
+                    <td>Free Throw %</td>
+                    <td>2 Point %</td>
+                    <td>3 Point %</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% if player_data %}
+                {% for id, values in player_data.items() %}
+                <tr>
+                    <td>{{ values['Player'] }}</td>
+                    <td>{{ values['Year'] }}</td>
+                    <td>{{ values['Tm'] }}</td>
+                    <td>{{ values['FTpct'] }}</td>
+                    <td>{{ values['2Ppct'] }}</td>
+                    <td>{{ values['3Ppct'] }}</td>
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function myFunction() {
+        myVar = setTimeout(showPage, 3000);
+    }
+
+    function showPage() {
+        document.getElementById("loader").style.display = "none";
+        document.getElementById("mainContainer").style.display = "block";
+    }
+</script>
+{% endblock %}
