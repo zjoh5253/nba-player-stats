@@ -4,6 +4,7 @@ Flask-WTF
 WTForms
 coverage
 gunicorn
+pyrebase
 # ecdsa
 # paramiko
 # pycrypto
